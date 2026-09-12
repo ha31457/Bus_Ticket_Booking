@@ -1,114 +1,98 @@
-Here is your complete, step-by-step **Video Recording Flow & Script** tailored for your hackathon submission (Target duration: **3:30 – 4:30 minutes**).
+Here's your complete 6-minute presentation plan, mapped against the judging criteria you shared earlier (theme alignment, ROI in numbers, usability/UX, value to users, good UI/functionality).
 
 ---
 
-# 📹 IntentGate Demo Video Flow & Script
+# 6-Minute Presentation Plan
+
+## Part 1: The Problem (0:00 – 2:00)
+
+**Hook (0:00–0:20)** — Open with a number, not a definition.
+> "AWS bill shock is one of the top reasons startups burn cash and sometimes shut down. A single forgotten GPU instance — a p4d at $32 an hour — left running over a weekend costs over $1,500. And you find out 2 days later, when Cost Explorer finally updates."
+
+**The gap (0:20–1:00)** — Use your problem images here.
+> "AWS has billing dashboards, but they're all *reactive*. Cost Explorer updates every 24–48 hours. Budgets alert you *after* you've crossed a threshold. There's no tool that tells you, in real time, the moment someone launches something expensive — and lets you kill it on the spot."
+
+**Who feels this (1:00–1:30)**
+> "This hits developers and platform teams every day. Someone spins up a test instance, forgets it. A misconfigured Terraform apply. A training job left running. Nobody's watching in the moment."
+
+**The solution in one line (1:30–2:00)**
+> "So we built AWS Cost Watchdog. It detects cost-impacting resource launches within 60 seconds, tells you exactly what it costs, who launched it, and lets you stop it with one click — right from Slack. And it keeps watching for idle waste after launch."
 
 ---
 
-## 🎬 Section 1: The Hook & Market Problem (0:00 - 0:45)
+## Part 2: The Demo (2:00 – 6:00)
 
-**[ON SCREEN]**: Title Slide or Camera / Full Screen Dashboard (`http://localhost:3000`)
-**[ACTION]**: Show the dashboard landing page with glowing metrics.
+Sequence for maximum impact — lead with the "wow," end with the strategic story.
 
-> 🎙️ **Voiceover**:
-> *"We are entering the era of Delegated AI Commerce — where AI shopping assistants don't just recommend products; they autonomously execute financial payments on behalf of users.*
->
-> *But giving probabilistic AI agents financial authority creates massive real-world risks:*
-> * 1. **Consumer Credit Risk**: If an agent overspends beyond the user's budget and the transaction bounces, it triggers bank penalties and directly degrades the user's **CIBIL credit score**.*
-> * 2. **Infrastructure Strain**: Unchecked AI retries and failed calls flood gateways like **Razorpay** and issuing banks with unnecessary traffic.*
-> * 3. **Legal Liability**: If an agent spends ₹15,000 more than approved, the AI company faces immediate lawsuits and customer loss.*
->
-> *Meet **IntentGate**: The Trust, Verification & Policy Infrastructure for Delegated AI Commerce."*
+### Demo 1 — Real-time HIGH-severity alert (2:00–2:50)
+Run the pre-built high-severity fixture (no real cost, instant, dramatic):
+```powershell
+aws lambda invoke --function-name cost-watchdog --payload fileb://tests/fixtures/ec2_high_severity_demo.json --region ap-south-1 out.json
+```
+**Say while it lands in Slack:**
+> "Someone just launched 2 p4d-class instances. Within seconds — here's the alert in Slack. Resource type, who launched it, hourly AND monthly cost in dollars and rupees, and a red HIGH-severity flag. This is the CloudTrail → EventBridge → Lambda pipeline firing in under 60 seconds."
 
----
+Point to the fields. Let the red alert speak for itself.
 
-## 🛡️ Section 2: Introducing IntentGate (0:45 - 1:15)
+### Demo 2 — Interactive kill-switch (2:50–4:00) — THE showpiece
+> "But an alert isn't enough. Watch this."
 
-**[ON SCREEN]**: Click on **Intent Firewall Pipeline** tab.
+Click **Stop Resource** → **Confirm stop**.
+> "One click, a confirmation step so nobody fat-fingers it, and the resource is actually stopped — no console, no hunting for the instance. This goes through a signed, secure callback: Slack signature verified, replay-protected, and the action is logged for audit."
 
-> 🎙️ **Voiceover**:
-> *"IntentGate operates on a simple principle: **LLMs propose. Policies constrain. APIs execute. Audit remembers.**
->
-> *It sits between probabilistic AI agents and payment APIs like Razorpay, acting as a zero-trust cryptographic firewall."*
+*(If the Slack interactivity setup isn't finished by demo time, have a fallback: show the confirm/cancel prompt, OR show the CLI verification that the callback stops the instance. Don't let a live-click risk derail you — have a screen recording ready as backup.)*
 
----
+### Demo 3 — Idle detection + rightsizing (4:00–4:45)
+> "It doesn't stop at launch. Every 15 minutes it checks running resources. If something's sitting idle — low CPU, no network, no activity — it flags it as wasted spend. And it goes further: if you're running an oversized instance, it recommends a smaller one and tells you exactly how much you'd save per month."
 
-## ⚡ Section 3: Live Demo — Happy Path & Live Razorpay Checkout (1:15 - 2:30)
+Show an idle alert (trigger the idle-monitor Lambda or show a captured one).
 
-**[ON SCREEN]**: **Intent Firewall Pipeline** screen.
-**[ACTION]**: 
-1. Click **Sample: ₹70k Laptop** button.
-2. Click **Extract Intent & Generate HMAC Fingerprint**.
+### Demo 4 — Daily digest + leaderboard (4:45–5:15)
+Trigger the digest:
+```powershell
+$p = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes('{"cadence":"daily"}'))
+aws lambda invoke --function-name cost-watchdog-digest --payload $p --region ap-south-1 out.json
+```
+> "And every morning, a digest: total spend, top cost drivers, idle resources still running, and a who-launched-what leaderboard for team accountability."
 
-> 🎙️ **Voiceover**:
-> *"Let's test it live. The user asks the agent: 'Find me a programming laptop under ₹70,000. Buy it if it meets my requirements.'
-> 
-> *Google Gemini 3.5 Flash extracts the structured intent, and IntentGate immediately generates a **Salted HMAC-SHA256 Fingerprint**. This locks the canonical identity of the user's intent to prevent prompt tampering.*
-> 
-> *Notice our **Assumption Ledger**: hard constraints like max budget ₹70,000 are enforced strictly, while soft inferences like preferred RAM are tracked as advisory metadata."*
+### Part 3: ROI + Why It Matters (5:15–6:00)
 
-**[ACTION]**:
-1. Leave selected product as **DevBook Pro 15 (₹68,999)**.
-2. Click **Evaluate IntentGate Policy Engine & Execute Transaction**.
+**The numbers (say these clearly — judges asked for ROI in numbers):**
+> "The ROI is concrete:
+> - Detection drops from **24–48 hours to under 60 seconds**
+> - Catching one forgotten p4d instance saves up to **$786 in a single day**
+> - The whole system runs serverless — it costs **near zero** to operate, only firing when a resource is created
+> - Deploys in **under 15 minutes** on any AWS account"
 
-> 🎙️ **Voiceover**:
-> *"Now the agent submits the purchase proposal for ₹68,999. IntentGate evaluates budget drift, catalog freshness, idempotency, and agent trust.
-> 
-> *The decision is **ALLOW**! An authentic **Razorpay Order ID** (`order_TXz...`) is generated live via Razorpay's API."*
-
-**[ACTION]**:
-1. Click the glowing **`[ 💳 Open Razorpay Payment UI ]`** button.
-2. Show the official **Razorpay Standard Checkout Modal** popping up on screen!
-
-> 🎙️ **Voiceover**:
-> *"Because IntentGate seamlessly integrates with Razorpay's Checkout SDK, we can trigger the official Razorpay payment modal live on screen with the created order ID!"*
+**The strategic close (this wins hackathons):**
+> "And here's the part that matters beyond just saving money: this doesn't fight AWS — it helps it. By catching waste and suggesting rightsizing and savings plans, it keeps customers on AWS longer, prevents the bill shock that drives them away, and reclaims idle capacity. It's a win for the developer AND for AWS. That's AWS Cost Watchdog."
 
 ---
 
-## 🧪 Section 4: Chaos Lab & Blocking Budget Drift (2:30 - 3:45)
+## Absolute Must-Cover (if you cut anything, keep these)
 
-**[ACTION]**:
-1. Close the modal, go to **Chaos Lab** tab in navigation.
-2. Enable **Agent Price Surge / Budget Drift** scenario toggle.
-3. Switch back to **Intent Firewall Pipeline** tab.
-4. Click **Sample: Budget Drift (+₹2,999)** or select **UltraDev X 16 (₹74,999)**.
-5. Click **Evaluate IntentGate Policy Engine & Execute Transaction**.
+1. **The 60-second real-time alert** — this is the core differentiator vs Cost Explorer. Non-negotiable.
+2. **The interactive kill-switch** — the single most impressive live moment. Remediate from Slack.
+3. **ROI in hard numbers** — judges explicitly asked. Say "24 hours → 60 seconds" and "$786/day saved."
+4. **The dual-benefit story** (developer + AWS) — this elevates you above a generic "save money" tool.
 
-> 🎙️ **Voiceover**:
-> *"Now let's simulate an attack or AI hallucination in our **Chaos Lab**. What if the agent tries to buy a laptop for ₹74,999 — exceeding the user's explicit ₹70,000 limit by ₹4,999?
->
-> *Watch what happens when we execute: **POLICY DECISION: BLOCK!**
-> 
-> *IntentGate instantly intercepts the transaction before any money touches Razorpay's API. We prevent the credit score bounce, shield Razorpay and the bank from unnecessary transaction processing, and protect the AI company from financial liability."*
+## Where to highlight hardest
+- **Speed** (60s) during Demo 1
+- **Action, not just alerting** (kill-switch) during Demo 2 — this is where you pause and let it land
+- **Ongoing value** (idle/rightsizing/digest) as proof it's a real product, not a one-trick demo
+- **ROI + AWS alignment** in the close — leave the judges with the numbers and the strategic angle
 
 ---
 
-## 📜 Section 5: Audit Replay & Agent Passports (3:45 - 4:15)
+## Practical prep checklist (do before you present)
 
-**[ACTION]**:
-1. Click **Transaction Replay** tab.
-2. Show the step-by-step cryptographic audit event timeline (`INTENT_VERIFIED`, `POLICY_EVALUATION`, `TRANSACTION_BLOCKED`).
-3. Click **Agent Passports** tab.
-4. Show Agent Alpha's Trust Score (e.g. 94 Trust Score, Blast Radius Protection).
+- **Finish the Slack interactivity setup** (disable Socket Mode, save the Request URL) so the kill-switch works live. This is your headline demo.
+- **Record a backup screen capture** of the full kill-switch flow, in case live Slack/network hiccups.
+- **Pre-stage your terminal** with the two invoke commands ready to paste — don't type them live.
+- **Have a real running instance ready** to stop during Demo 2, and terminate everything after.
+- **Rehearse once with a timer.** 2 min problem + 4 min demo is tight; the demo commands must be instant.
 
-> 🎙️ **Voiceover**:
-> *"Every single decision is logged on an **Immutable Transaction Replay Timeline**, providing auditability for financial disputes. Furthermore, **Agent Passports** track historical compliance, auto-adjusting agent single-transaction limits and trust scores based on behavior."*
+## Timing risk
+4 minutes for 4 demos is aggressive. If you're running short, **drop Demo 3 or 4** (idle/digest) and protect Demos 1 and 2 (alert + kill-switch) plus the ROI close. Better to nail two demos than rush four.
 
----
-
-## 🏁 Section 6: Conclusion (4:15 - 4:30)
-
-**[ON SCREEN]**: Overview Dashboard tab showing summary stats & protected risk exposure.
-
-> 🎙️ **Voiceover**:
-> *"IntentGate brings zero-trust cryptographic security to the next decade of agentic AI commerce.
-> 
-> *Thank you!"*
-
----
-
-### 💡 Quick Recording Checklist
-1. Ensure both **FastAPI backend** (`http://localhost:8000`) and **Next.js frontend** (`http://localhost:3000`) are running.
-2. Keep your mouse movements smooth and deliberate when clicking buttons.
-3. Have your browser zoomed to ~100% or 110% so text and modal details look crisp.
+Want me to write a tight one-page cue card version of this you can keep beside you while presenting, or draft the exact spoken script word-for-word?
