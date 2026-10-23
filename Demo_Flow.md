@@ -196,3 +196,12 @@ If an examiner asks you to test a live custom input instead of a preset, use one
 | **Terminal throws Unicode / Emoji error** | Ensure PowerShell is running in UTF-8: `$OutputEncoding = [Console]::OutputEncoding = [Text.UTF8Encoding]::UTF8` |
 | **Examiner asks: "Does this call OpenAI or ChatGPT?"** | Confidently state: *"No, sir/ma'am. PaperTrail is 100% self-contained and deterministic. It uses local Scikit-Learn vector spaces and an algorithmic RAG synthesis engine. It runs completely offline with zero API costs, zero hallucination, and sub-second execution."* |
 | **Examiner asks: "Did you test this code?"** | Open a new terminal tab and run `python -m pytest -v`. Let them watch all 50 tests pass in real time. |
+
+There are **6 clusters** ($K = 6$, validated via Silhouette Coefficient analysis):
+
+1. **Cluster 0:** Multi-Task Learning & Feature Representations
+2. **Cluster 1:** Transformers & Self-Attention Architectures
+3. **Cluster 2:** Deep Learning & Neural Network Foundations
+4. **Cluster 3:** Graph Neural Networks & Relational Reasoning
+5. **Cluster 4:** Reinforcement Learning & Autonomous Decision-Making
+6. **Cluster 5:** Medical ML, Clinical EHR & Bioinformatics
